@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpPlot", "SharpPlot\SharpPlot.csproj", "{A2057D98-12D9-4AD7-A000-C9A77EF411E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo1", "Demo1\Demo1.csproj", "{298EF286-51AA-4A52-908D-F8BEF54FF210}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A2057D98-12D9-4AD7-A000-C9A77EF411E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2057D98-12D9-4AD7-A000-C9A77EF411E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2057D98-12D9-4AD7-A000-C9A77EF411E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2057D98-12D9-4AD7-A000-C9A77EF411E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{298EF286-51AA-4A52-908D-F8BEF54FF210}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{298EF286-51AA-4A52-908D-F8BEF54FF210}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{298EF286-51AA-4A52-908D-F8BEF54FF210}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{298EF286-51AA-4A52-908D-F8BEF54FF210}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
