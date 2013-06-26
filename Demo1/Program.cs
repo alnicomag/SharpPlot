@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using SharpPlot;
+using System.Diagnostics;
 
 namespace Demo1
 {
@@ -31,7 +32,7 @@ namespace Demo1
 			rk.RegistrateMethod(sys.Eq0_i);
 			rk.RegistrateMethod(sys.Eq1_omega);
 			rk.RegistrateMethod(sys.Eq2_theta);
-			rk.ODE4(new double[] { 0, 0, 0 });		// 初期条件を全て0として解く
+			rk.ODE4(0,0,0);		// 初期条件を全て0として解く
 
 			string filename = "motor_simu_sample1";
 			using (StreamWriter sw = new StreamWriter(filename + ".txt"))
@@ -52,7 +53,7 @@ namespace Demo1
 				gnuplot.SetXLabel("Time [ms]", 20);
 				gnuplot.SetYLabel("Current [A]", 20);
 				gnuplot.SetY2Label("Rotation frequency [rpm]", 20);
-				gnuplot.SetYRange(0, 80);
+				gnuplot.SetYRange(0, 90);
 				gnuplot.SetY2Range(0, 9000);
 				gnuplot.SetXTics(0, 2);
 				gnuplot.SetYTics(0, 5);
@@ -65,6 +66,7 @@ namespace Demo1
 				gnuplot.Stream.WriteLine("unset style line");
 				gnuplot.Stream.WriteLine("set terminal wxt");
 			}
+		//	Process.Start(filename + ".eps");
 		}
 
 		/// <summary>
@@ -205,7 +207,7 @@ namespace Demo1
 		/// セットされた連立常微分方程式を初期条件を元に解く
 		/// </summary>
 		/// <param name="initial_conditions">初期条件ベクトル</param>
-		public void ODE4(double[] initial_conditions)
+		public void ODE4(params double[] initial_conditions)
 		{
 			x = new double[Eqnum, Element];
 			try
@@ -263,6 +265,28 @@ namespace Demo1
 		public double[] GetTime()
 		{
 			return time;
+		}
+
+		/// <summary>
+		/// 指定された行の最大の解の値を取得する
+		/// </summary>
+		/// <param name="line"></param>
+		/// <returns></returns>
+		public double GetMaxValue(int line)
+		{
+			if ((line < 0) || (Eqnum <= line) || (x.GetLength(1)<2))
+			{
+				throw new ArgumentException();
+			}
+			double max = x[line, 0];
+			for (int i = 1; i < x.GetLength(1); i++)
+			{
+				if (x[line, i] > max)
+				{
+					max = x[line, i];
+				}
+			}
+			return max;
 		}
 
 		/// <summary>
