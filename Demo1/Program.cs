@@ -14,8 +14,8 @@ namespace Demo1
 	{
 		static void Main(string[] args)
 		{
-			double analysis_time = 0.03;
-			double time_step = 1.0e-6;
+			double analysis_time = 0.03;	// 解析時間
+			double time_step = 1.0e-6;		// ステップ幅
 			int element = (int)(analysis_time / time_step) + 1;
 
 			System sys = new System();
@@ -27,8 +27,8 @@ namespace Demo1
 			sys.C = (0.137 * 30.2 / 1000) / (7580 * 2 * Math.PI / 60);
 			sys.Tl = 0;
 			sys.Kt = 30.2 / 1000;
-			sys.Duty = 0.3;
-			sys.Freq = 10e3;
+			sys.Duty = 0.25;
+			sys.Freq = 30e3;
 
 			RungeKutta rk = new RungeKutta(time_step, element);
 			rk.RegistrateMethod(sys.Eq0_i);
@@ -37,16 +37,16 @@ namespace Demo1
 			rk.ODE4(0,0,0);		// 初期条件を全て0として解く
 
 			string filename = "motor_simu_sample1";
-			using (StreamWriter sw = new StreamWriter(filename + ".txt"))
+			using (StreamWriter sw = new StreamWriter(filename + ".txt"))	// gnuplotに読み込める形式で.txtファイルに出力
 			{
 				WriteFile(sw, rk, " ");
 			}
-			using (StreamWriter sw = new StreamWriter(filename + ".csv"))
+			using (StreamWriter sw = new StreamWriter(filename + ".csv"))	// .csvファイルでも出力
 			{
 				WriteFile(sw, rk, "\t");
 			}
 
-			using (PlotStream gnuplot = new PlotStream())
+			using (PlotStream gnuplot = new PlotStream())		// gnuplotを立ち上げ，出力した.txtファイルからグラフを描かせる．
 			{
 				gnuplot.Start();
 				gnuplot.ChangeDirectory(Directory.GetCurrentDirectory());
@@ -63,7 +63,7 @@ namespace Demo1
 				gnuplot.SetXTics(0, Math.Ceiling(analysis_time * 1000 / 15));	// 横軸を15分割する刻みより大きい最小の整数値を目盛幅とする
 
 				int y_div = 20;
-				double y1_range = Utility.OptimizeRange(Math.Max(Math.Abs(rk.GetMinValue(0)), Math.Abs(rk.GetMaxValue(0))));
+				double y1_range = Utility.OptimizeRange(Math.Max(Math.Abs(rk.GetMinValue(0)), Math.Abs(rk.GetMaxValue(0)))*1.05);
 				gnuplot.SetYRange(-y1_range, y1_range);
 				gnuplot.SetYTics(-y1_range, y1_range / y_div * 2);
 				double y2_range = Utility.OptimizeRange(Math.Max(Math.Abs(rk.GetMinValue(1) * 60 / 2 / Math.PI), Math.Abs(rk.GetMaxValue(1) * 60 / 2 / Math.PI))*1.2);
@@ -131,7 +131,7 @@ namespace Demo1
 		public double Kt { get; set; }
 
 		/// <summary>
-		/// 印加電圧
+		/// 電源電圧
 		/// </summary>
 		public double E { get; set; }
 		/// <summary>
@@ -173,13 +173,21 @@ namespace Demo1
 			return x[1];
 		}
 		
+		/// <summary>
+		/// 周期
+		/// </summary>
 		private double Period { get { return 1 / Freq; } }
 		private double LeftDuty { get { return (1 + Duty) * 0.5; } }
 		private double RightDuty { get { return (1 - Duty) * 0.5; } }
 
+		/// <summary>
+		/// 印加電圧
+		/// </summary>
+		/// <param name="t">時刻</param>
+		/// <returns>電圧</returns>
 		private double V(double t)
 		{
-			double time_in_period = t - Math.Floor(t / Period) * Period;
+			double time_in_period = t - Period * (int)(t / Period);
 			return (LeftV(time_in_period) - RightV(time_in_period)) * E;
 		}
 
@@ -188,8 +196,6 @@ namespace Demo1
 
 		private double duty;
 	}
-
-	
 
 	/// <summary>
 	/// ルンゲクッタ法
@@ -213,6 +219,8 @@ namespace Demo1
 			}
 			Eq = new List<SystemEq>();
 		}
+
+		public int Element { get; private set; }	// 時間節点の数
 
 		public delegate double SystemEq(double t, double[] x);
 
@@ -297,7 +305,7 @@ namespace Demo1
 		}
 
 		/// <summary>
-		/// 指定された行の最大の解の値を取得する
+		/// 指定された独立変数の解の最大値を取得する
 		/// </summary>
 		/// <param name="line"></param>
 		/// <returns></returns>
@@ -318,6 +326,11 @@ namespace Demo1
 			return max;
 		}
 
+		/// <summary>
+		/// 指定された独立変数の解の最小値を取得する
+		/// </summary>
+		/// <param name="line"></param>
+		/// <returns></returns>
 		public double GetMinValue(int line)
 		{
 			if ((line < 0) || (Eqnum <= line) || (x.GetLength(1) < 2))
@@ -352,8 +365,7 @@ namespace Demo1
 		}
 
 		private List<SystemEq> Eq;
-		public int Element { get; private set; }	// 時間節点の数
-		private double TimeStep { get; set; }			// 時間刻み[s]
+		private double TimeStep { get; set; }		// 時間刻み[s]
 		private int Eqnum { get; set; }				// 独立変数の数
 		private double[] time;						// 時刻列
 		private double[,] x;						// 解
