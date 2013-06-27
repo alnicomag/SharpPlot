@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 using SharpPlot;
-using System.Diagnostics;
 
 namespace Demo1
 {
@@ -14,7 +13,7 @@ namespace Demo1
 	{
 		static void Main(string[] args)
 		{
-			double analysis_time = 0.03;	// 解析時間
+			double analysis_time = 0.05;	// 解析時間
 			double time_step = 1.0e-6;		// ステップ幅
 			int element = (int)(analysis_time / time_step) + 1;
 
@@ -27,8 +26,8 @@ namespace Demo1
 			sys.C = (0.137 * 30.2 / 1000) / (7580 * 2 * Math.PI / 60);
 			sys.Tl = 0;
 			sys.Kt = 30.2 / 1000;
-			sys.Duty = 0.25;
-			sys.Freq = 30e3;
+			sys.Duty = 0.3;
+			sys.Freq = 1e3;
 
 			RungeKutta rk = new RungeKutta(time_step, element);
 			rk.RegistrateMethod(sys.Eq0_i);
