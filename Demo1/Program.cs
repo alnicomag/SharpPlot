@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 using SharpPlot;
 
@@ -13,7 +14,7 @@ namespace Demo1
 	{
 		static void Main(string[] args)
 		{
-			double analysis_time = 0.05;	// 解析時間
+			double analysis_time = 0.1;	// 解析時間
 			double time_step = 1.0e-6;		// ステップ幅
 			int element = (int)(analysis_time / time_step) + 1;
 
@@ -53,19 +54,19 @@ namespace Demo1
 				gnuplot.SetLineStyle(2, new LineStyle(1, 2, Color.Cyan));
 				gnuplot.PlotFromFile(filename, 1, 2, PlottingStyle.lines, 1, PlotAxis.x1y1, "Current");
 				gnuplot.ReplotFromFile(filename, 1, 3, PlottingStyle.lines, 2, PlotAxis.x1y2, "Rotation frequency");
-				
+
 				gnuplot.SetXLabel("Time [ms]", 20);
 				gnuplot.SetYLabel("Current [A]", 20);
 				gnuplot.SetY2Label("Rotation frequency [rpm]", 20);
-				
+
 				gnuplot.SetXRange(0, analysis_time * 1000);
-				gnuplot.SetXTics(0, Math.Ceiling(analysis_time * 1000 / 15));	// 横軸を15分割する刻みより大きい最小の整数値を目盛幅とする
+				gnuplot.SetXTics(0, Math.Ceiling(analysis_time * 1000 / 20));	// 横軸を20分割する刻みより大きい最小の整数値を目盛幅とする
 
 				int y_div = 20;
-				double y1_range = Utility.OptimizeRange(Math.Max(Math.Abs(rk.GetMinValue(0)), Math.Abs(rk.GetMaxValue(0)))*1.05);
+				double y1_range = Utility.OptimizeRange(Math.Max(Math.Abs(rk.GetMinValue(0)), Math.Abs(rk.GetMaxValue(0))) * 1.05);
 				gnuplot.SetYRange(-y1_range, y1_range);
 				gnuplot.SetYTics(-y1_range, y1_range / y_div * 2);
-				double y2_range = Utility.OptimizeRange(Math.Max(Math.Abs(rk.GetMinValue(1) * 60 / 2 / Math.PI), Math.Abs(rk.GetMaxValue(1) * 60 / 2 / Math.PI))*1.2);
+				double y2_range = Utility.OptimizeRange(Math.Max(Math.Abs(rk.GetMinValue(1) * 60 / 2 / Math.PI), Math.Abs(rk.GetMaxValue(1) * 60 / 2 / Math.PI)) * 1.2);
 				gnuplot.SetY2Range(-y2_range, y2_range);
 				gnuplot.SetY2Tics(-y2_range, y2_range / y_div * 2);
 
@@ -77,7 +78,7 @@ namespace Demo1
 				gnuplot.Stream.WriteLine("unset style line");
 				gnuplot.Stream.WriteLine("set terminal wxt");
 			}
-		//	Process.Start(filename + ".eps");
+			Process.Start(filename + ".eps");
 		}
 
 		/// <summary>
@@ -138,7 +139,15 @@ namespace Demo1
 		/// </summary>
 		public double Tl { get; set; }
 
-		public double Duty { get { return duty; } set { if ((-1 <= value) && (value <= 1)) { duty = value; } else { throw new ArgumentException(); } } }
+		public double Duty
+		{
+			get { return duty; }
+			set
+			{
+				if ((-1 <= value) && (value <= 1)) { duty = value; }
+				else { throw new ArgumentException(); }
+			}
+		}
 		public double Freq { get; set; }
 
 		/// <summary>
@@ -263,21 +272,23 @@ namespace Demo1
 				double* k4 = stackalloc double[Eqnum];
 				double[] temp_x = new double[Eqnum];
 
-				for (int i = 0; i < (Element - 1); ++i)
+				int loop = Element - 1;
+				int eqnum = Eqnum;
+				for (int i = 0; i < loop; ++i)
 				{
-					for (int j = 0; j < Eqnum; ++j) { temp_x[j] = x[j, i]; }
-					for (int j = 0; j < Eqnum; ++j) { k1[j] = TimeStep * Eq[j](time[i], temp_x); }
+					for (int j = 0; j < eqnum; ++j) { temp_x[j] = x[j, i]; }
+					for (int j = 0; j < eqnum; ++j) { k1[j] = TimeStep * Eq[j](time[i], temp_x); }
 
-					for (int j = 0; j < Eqnum; ++j) { temp_x[j] = x[j, i] + k1[j] * 0.5; }
-					for (int j = 0; j < Eqnum; ++j) { k2[j] = TimeStep * Eq[j](time[i] + TimeStep * 0.5, temp_x); }
+					for (int j = 0; j < eqnum; ++j) { temp_x[j] = x[j, i] + k1[j] * 0.5; }
+					for (int j = 0; j < eqnum; ++j) { k2[j] = TimeStep * Eq[j](time[i] + TimeStep * 0.5, temp_x); }
 
-					for (int j = 0; j < Eqnum; ++j) { temp_x[j] = x[j, i] + k2[j] * 0.5; }
-					for (int j = 0; j < Eqnum; ++j) { k3[j] = TimeStep * Eq[j](time[i] + TimeStep * 0.5, temp_x); }
+					for (int j = 0; j < eqnum; ++j) { temp_x[j] = x[j, i] + k2[j] * 0.5; }
+					for (int j = 0; j < eqnum; ++j) { k3[j] = TimeStep * Eq[j](time[i] + TimeStep * 0.5, temp_x); }
 
-					for (int j = 0; j < Eqnum; ++j) { temp_x[j] = x[j, i] + k3[j]; }
-					for (int j = 0; j < Eqnum; ++j) { k4[j] = TimeStep * Eq[j](time[i] + TimeStep, temp_x); }
+					for (int j = 0; j < eqnum; ++j) { temp_x[j] = x[j, i] + k3[j]; }
+					for (int j = 0; j < eqnum; ++j) { k4[j] = TimeStep * Eq[j](time[i] + TimeStep, temp_x); }
 
-					for (int j = 0; j < Eqnum; ++j)
+					for (int j = 0; j < eqnum; ++j)
 					{
 						x[j, i + 1] = x[j, i] + (k1[j] + 2 * (k2[j] + k3[j]) + k4[j]) * 0.1666666666666667;
 					}
