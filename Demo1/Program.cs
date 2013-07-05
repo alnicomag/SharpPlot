@@ -14,8 +14,8 @@ namespace Demo1
 	{
 		static void Main(string[] args)
 		{
-			double analysis_time = 0.1;	// 解析時間
-			double time_step = 1.0e-6;		// ステップ幅
+			double analysis_time = 1;	// 解析時間
+			double time_step = 1.0e-4;		// ステップ幅
 			int element = (int)(analysis_time / time_step) + 1;
 
 			System sys = new System();
@@ -27,8 +27,9 @@ namespace Demo1
 			sys.C = (0.137 * 30.2 / 1000) / (7580 * 2 * Math.PI / 60);
 			sys.Tl = 0;
 			sys.Kt = 30.2 / 1000;
-			sys.Duty = 0.3;
+			sys.Duty = t => t < 0.5 ? t * 1.6 : 0.8;
 			sys.Freq = 1e3;
+			sys.PWM = false;
 
 			RungeKutta rk = new RungeKutta(time_step, element);
 			rk.RegistrateMethod(sys.Eq0_i);
@@ -78,7 +79,7 @@ namespace Demo1
 				gnuplot.Stream.WriteLine("unset style line");
 				gnuplot.Stream.WriteLine("set terminal wxt");
 			}
-			Process.Start(filename + ".eps");
+		//	Process.Start(filename + ".eps");
 		}
 
 		/// <summary>
@@ -98,6 +99,7 @@ namespace Demo1
 				sw.WriteLine("{1}{0}{2}{0}{3}{0}{4}", partition, time, current, rpm, theta);
 			}
 		}
+
 	}
 
 	/// <summary>
@@ -139,16 +141,13 @@ namespace Demo1
 		/// </summary>
 		public double Tl { get; set; }
 
-		public double Duty
-		{
-			get { return duty; }
-			set
-			{
-				if ((-1 <= value) && (value <= 1)) { duty = value; }
-				else { throw new ArgumentException(); }
-			}
-		}
 		public double Freq { get; set; }
+
+		public delegate double Ft(double t);
+
+		public Ft Duty { private get; set; }
+
+		public bool PWM { get; set; }
 
 		/// <summary>
 		/// 第1式（電流の時間微分項）
@@ -185,8 +184,8 @@ namespace Demo1
 		/// 周期
 		/// </summary>
 		private double Period { get { return 1 / Freq; } }
-		private double LeftDuty { get { return (1 + Duty) * 0.5; } }
-		private double RightDuty { get { return (1 - Duty) * 0.5; } }
+	//	private double LeftDuty { get { return (1 + Duty) * 0.5; } }
+	//	private double RightDuty { get { return (1 - Duty) * 0.5; } }
 
 		/// <summary>
 		/// 印加電圧
@@ -195,14 +194,28 @@ namespace Demo1
 		/// <returns>電圧</returns>
 		private double V(double t)
 		{
-			double time_in_period = t - Period * (int)(t / Period);
-			return (LeftV(time_in_period) - RightV(time_in_period)) * E;
+			if (PWM)
+			{
+				double time_in_period = t - Period * (int)(t / Period);
+				double v_l = time_in_period < Period * LeftDuty(t) ? 1 : 0;
+				double v_r = time_in_period < Period * RightDuty(t) ? 1 : 0;
+				return (v_l - v_r) * E;
+			}
+			else
+			{
+				return Duty(t) * E;
+			}
 		}
 
-		private int LeftV(double t) { return t < Period * LeftDuty ? 1 : 0; }
-		private int RightV(double t) { return t < Period * RightDuty ? 1 : 0; }
+		private double LeftDuty(double t)
+		{
+			return (1.0 + Duty(t)) * 0.5;
+		}
 
-		private double duty;
+		private double RightDuty(double t)
+		{
+			return (1.0 - Duty(t)) * 0.5;
+		}
 	}
 
 	/// <summary>
