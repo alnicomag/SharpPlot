@@ -34,7 +34,7 @@ namespace Demo1
 			rk.RegistrateMethod(sys.Eq0_i);
 			rk.RegistrateMethod(sys.Eq1_omega);
 			rk.RegistrateMethod(sys.Eq2_theta);
-			rk.ODE4(0,0,0);		// 初期条件を全て0として解く
+			rk.ODE4(0, 0, 0);		// 初期条件を全て0として解く
 
 			string filename = "motor_simu_sample1";
 			using (StreamWriter sw = new StreamWriter(filename + ".txt"))	// gnuplotに読み込める形式で.txtファイルに出力
@@ -95,7 +95,7 @@ namespace Demo1
 				double current = rk.GetSolution()[0, i];					// 電流[A]
 				double rpm = rk.GetSolution()[1, i] * 60 / 2 / Math.PI;		// 回転数．単位を[rad/s]から[rpm]に変更．
 				double theta = rk.GetSolution()[2, i];						// 回転角[rad]
-				sw.WriteLine("{1}{0}{2}{0}{3}{0}{4}",partition, time, current, rpm, theta);
+				sw.WriteLine("{1}{0}{2}{0}{3}{0}{4}", partition, time, current, rpm, theta);
 			}
 		}
 	}
@@ -180,7 +180,7 @@ namespace Demo1
 		{
 			return x[1];
 		}
-		
+
 		/// <summary>
 		/// 周期
 		/// </summary>
@@ -321,7 +321,7 @@ namespace Demo1
 		/// <returns></returns>
 		public double GetMaxValue(int line)
 		{
-			if ((line < 0) || (Eqnum <= line) || (x.GetLength(1)<2))
+			if ((line < 0) || (Eqnum <= line) || (x.GetLength(1) < 2))
 			{
 				throw new ArgumentException();
 			}
