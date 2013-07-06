@@ -14,7 +14,7 @@ namespace Demo1
 	{
 		static void Main(string[] args)
 		{
-			double analysis_time = 1;	// 解析時間
+			double analysis_time = 10;	// 解析時間
 			double time_step = 1.0e-4;		// ステップ幅
 			int element = (int)(analysis_time / time_step) + 1;
 
@@ -27,7 +27,7 @@ namespace Demo1
 			sys.C = (0.137 * 30.2 / 1000) / (7580 * 2 * Math.PI / 60);
 			sys.Tl = 0;
 			sys.Kt = 30.2 / 1000;
-			sys.Duty = t => t < 0.5 ? t * 1.6 : 0.8;
+			sys.Duty = t => Math.Sin(2 * Math.PI * 0.2 * t);
 			sys.Freq = 1e3;
 			sys.PWM = false;
 
@@ -56,12 +56,13 @@ namespace Demo1
 				gnuplot.PlotFromFile(filename, 1, 2, PlottingStyle.lines, 1, PlotAxis.x1y1, "Current");
 				gnuplot.ReplotFromFile(filename, 1, 3, PlottingStyle.lines, 2, PlotAxis.x1y2, "Rotation frequency");
 
-				gnuplot.SetXLabel("Time [ms]", 20);
+				gnuplot.SetXLabel("Time [s]", 20);
 				gnuplot.SetYLabel("Current [A]", 20);
 				gnuplot.SetY2Label("Rotation frequency [rpm]", 20);
+				gnuplot.SetTicsFont(12, "Helvetica");
 
-				gnuplot.SetXRange(0, analysis_time * 1000);
-				gnuplot.SetXTics(0, Math.Ceiling(analysis_time * 1000 / 20));	// 横軸を20分割する刻みより大きい最小の整数値を目盛幅とする
+				gnuplot.SetXRange(0, analysis_time);
+				gnuplot.SetXTics(0, Math.Ceiling(analysis_time / 20));	// 横軸を20分割する刻みより大きい最小の整数値を目盛幅とする
 
 				int y_div = 20;
 				double y1_range = Utility.OptimizeRange(Math.Max(Math.Abs(rk.GetMinValue(0)), Math.Abs(rk.GetMaxValue(0))) * 1.05);
@@ -92,7 +93,7 @@ namespace Demo1
 		{
 			for (int i = 0; i < rk.Element; i++)
 			{
-				double time = rk.GetTime()[i] * 1000;						// 時刻．単位を[ms]に変更．
+				double time = rk.GetTime()[i];								// 時刻[s]．
 				double current = rk.GetSolution()[0, i];					// 電流[A]
 				double rpm = rk.GetSolution()[1, i] * 60 / 2 / Math.PI;		// 回転数．単位を[rad/s]から[rpm]に変更．
 				double theta = rk.GetSolution()[2, i];						// 回転角[rad]

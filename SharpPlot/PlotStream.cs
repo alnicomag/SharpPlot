@@ -330,6 +330,10 @@ namespace SharpPlot
 			Stream.WriteLine("set ytics nomirror");
 			Stream.WriteLine("set y2tics {0},{1}", start, tic);
 		}
+		public void SetTicsFont(double fontsize, string font)
+		{
+			Stream.WriteLine("set tics font \"{0},{1}\"", font, fontsize);
+		}
 
 		#endregion
 
