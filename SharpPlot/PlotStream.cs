@@ -287,27 +287,81 @@ namespace SharpPlot
 
 		#region tics
 
-		public void SetXTics()
+		/// <summary>
+		/// 自動でx軸の目盛りを切り直す．
+		/// <param name="mirror">上下双方に目盛りを打つかどうか</param>
+		/// </summary>
+		public void SetXTics(bool mirror)
 		{
 			ThrowExceptionIfDisposed();
 			Stream.WriteLine("set xtics");
-			Stream.WriteLine("set xtics nomirror");
+			Stream.WriteLine("set xtics {0}", mirror ? "mirror" : "nomirror");
 		}
-		public void SetXTics(double start, double tic)
+		
+		/// <summary>
+		/// 初期値から増分値刻みでx軸の目盛りを切り直す．
+		/// </summary>
+		/// <param name="start">初期値</param>
+		/// <param name="tic">増分</param>
+		/// <param name="mirror">上下双方に目盛りを打つかどうか</param>
+		/// </summary>
+		public void SetXTics(double start, double tic, bool mirror)
 		{
 			ThrowExceptionIfDisposed();
 			Stream.WriteLine("set xtics {0},{1}", start, tic);
-			Stream.WriteLine("set xtics nomirror");
+			Stream.WriteLine("set xtics {0}", mirror ? "mirror" : "nomirror");
 		}
+
+		/// <summary>
+		/// 初期値から増分値刻みで終了値までx軸の目盛りを切り直す．
+		/// </summary>
+		/// <param name="start">初期値</param>
+		/// <param name="tic">増分</param>
+		/// <param name="end">終了値</param>
+		/// <param name="mirror">上下双方に目盛りを打つかどうか</param>
+		public void SetXTics(double start, double tic, double end, bool mirror)
+		{
+			ThrowExceptionIfDisposed();
+			Stream.WriteLine("set xtics {0},{1},{2}", start, tic, end);
+			Stream.WriteLine("set xtics {0}", mirror ? "mirror" : "nomirror");
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="tics">目盛りを打つ座標値</param>
+		public void SetXTics(params double[] tics)
+		{
+			ThrowExceptionIfDisposed();
+			StringBuilder sb = new StringBuilder();
+			sb.Append("set xtics (");
+			foreach (var item in tics)
+			{
+				sb.Append(item.ToString());
+				sb.Append(",");
+			}
+			sb.Remove(sb.Length - 1, 1);
+			sb.Append(")");
+			Stream.WriteLine(sb.ToString());
+		}
+
 		public void SetX2Tics()
 		{
 			ThrowExceptionIfDisposed();
+			Stream.WriteLine("set x2tics nomirror");
 			Stream.WriteLine("set x2tics");
 		}
 		public void SetX2Tics(double start, double tic)
 		{
 			ThrowExceptionIfDisposed();
+			Stream.WriteLine("set x2tics nomirror");
 			Stream.WriteLine("set x2tics {0},{1}", start, tic);
+		}
+		public void SetX2Tics(double start, double tic,double end)
+		{
+			ThrowExceptionIfDisposed();
+			Stream.WriteLine("set x2tics nomirror");
+			Stream.WriteLine("set x2tics {0},{1},{2}", start, tic, end);
 		}
 		public void SetYTics()
 		{
