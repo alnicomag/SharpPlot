@@ -176,16 +176,26 @@ namespace SharpPlot
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="filename">ファイル名．拡張子を含む．</param>
+		/// <param name="x_column"></param>
+		/// <param name="y_column"></param>
+		/// <param name="ps"></param>
+		/// <param name="style_num"></param>
+		/// <param name="axis"></param>
+		/// <param name="title"></param>
 		public void PlotFromFile(string filename, int x_column, int y_column, PlottingStyle ps, int style_num, PlotAxis axis, string title)
 		{
 			ThrowExceptionIfDisposed();
-			Stream.WriteLine("plot '{0}.txt' using {1}:{2} with {3} ls {4} axis {5} title \"{6}\"", filename, x_column, y_column, ps, style_num, axis, title);
+			Stream.WriteLine("plot '{0}' using {1}:{2} with {3} ls {4} axis {5} title \"{6}\"", filename, x_column, y_column, ps, style_num, axis, title);
 		}
 
 		public void ReplotFromFile(string filename, int x_column, int y_column, PlottingStyle ps, int style_num, PlotAxis axis, string title)
 		{
 			ThrowExceptionIfDisposed();
-			Stream.WriteLine("replot '{0}.txt' using {1}:{2} with {3} ls {4} axis {5} title \"{6}\"", filename, x_column, y_column, ps, style_num, axis, title);
+			Stream.WriteLine("replot '{0}' using {1}:{2} with {3} ls {4} axis {5} title \"{6}\"", filename, x_column, y_column, ps, style_num, axis, title);
 		}
 
 		public void SplotFromFile(string filename, int x_column, int y_column, int z_colum, PlottingStyle ps)
@@ -199,14 +209,14 @@ namespace SharpPlot
 			Stream.WriteLine("set contour base");
 
 			Stream.WriteLine("set hidden3d");
-			Stream.WriteLine("splot '{0}.txt' using {1}:{2}:{3} with {4}", filename, x_column, y_column, z_colum, ps, ps.ToString());
+			Stream.WriteLine("splot '{0}' using {1}:{2}:{3} with {4}", filename, x_column, y_column, z_colum, ps, ps.ToString());
 		}
 
 		public void ColorContourFromFile(string filename, int x_column, int y_column, int z_colum)
 		{
 			Stream.WriteLine("set palette defined (-1 \"blue\", 0 \"white\", 1 \"red\")");
 			Stream.WriteLine("set pm3d map");
-			Stream.WriteLine("splot '{0}.txt' using {1}:{2}:{3}", filename, x_column, y_column, z_colum);
+			Stream.WriteLine("splot '{0}' using {1}:{2}:{3}", filename, x_column, y_column, z_colum);
 		}
 
 		public void LineContourFromFile(string filename, int x_column, int y_column, int z_colum)
@@ -218,7 +228,7 @@ namespace SharpPlot
 			Stream.WriteLine("unset surface");
 			//	Stream.WriteLine("set palette defined (-1 \"blue\", 0 \"white\", 1 \"red\")");
 			Stream.WriteLine("set pm3d map");
-			Stream.WriteLine("splot '{0}.txt' using {1}:{2}:{3}", filename, x_column, y_column, z_colum);
+			Stream.WriteLine("splot '{0}' using {1}:{2}:{3}", filename, x_column, y_column, z_colum);
 		}
 
 		#region label
