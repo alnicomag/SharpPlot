@@ -126,7 +126,11 @@ namespace SharpPlot
 			SetDefaultLineStyle();
 		}
 
-		
+		public void Command(string str)
+		{
+			ThrowExceptionIfDisposed();
+			Stream.WriteLine(str);
+		}
 
 		public LineStyle LineStyle { get; set; }
 
