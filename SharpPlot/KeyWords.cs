@@ -145,7 +145,9 @@
 
 	public enum Terminal
 	{
-		MonochromeEPS,
-		ColorEPS
+		postscript,
+		epscairo,
+		pdfcairo,
+		pngcairo
 	}
 }

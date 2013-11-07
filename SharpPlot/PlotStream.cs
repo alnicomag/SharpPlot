@@ -406,6 +406,11 @@ namespace SharpPlot
 		#endregion
 
 
+		public void SetLegendFont(int fontsize,string font)
+		{
+			ThrowExceptionIfDisposed();
+			Stream.WriteLine("set key font \"{0},{1}\"", font, fontsize);
+		}
 		public void SetLegendPosition(params LegendPosition[] position)
 		{
 			ThrowExceptionIfDisposed();
@@ -422,10 +427,15 @@ namespace SharpPlot
 				throw (new ArgumentException());
 			}
 		}
-		public void SetLegendBox()
+		public void SetLegendBox(int linetype, double linewidth)
 		{
 			ThrowExceptionIfDisposed();
-			Stream.WriteLine("set key box");
+			Stream.WriteLine("set key box lt {0} lw {1}", linetype, linewidth);
+		}
+		public void SetLegendTitle(string title)
+		{
+			ThrowExceptionIfDisposed();
+			Stream.WriteLine("set key title '{0}'", title);
 		}
 		public void EraseLegend()
 		{
@@ -489,16 +499,43 @@ namespace SharpPlot
 			}
 		}
 
-		public void SetTerminal()
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="term">ターミナル</param>
+		/// <param name="size_x">横サイズ．pngはピクセル単位．pdf,postscriptはmm単位</param>
+		/// <param name="size_y">縦サイズ．pngはピクセル単位．pdf,postscriptはmm単位</param>
+		/// <param name="fontsize">フォントサイズ</param>
+		/// <param name="font">フォント名</param>
+		public void SetTerminal(Terminal term, double size_x, double size_y, int fontsize, string font = "Times-Roman")
 		{
 			ThrowExceptionIfDisposed();
-			Stream.WriteLine("set terminal postscript eps enhanced color \"Times-Roman,16\"");
+
+			switch (term)
+			{
+				case Terminal.postscript:
+					Stream.WriteLine("set term postscript eps enhanced color size {0}cm,{1}cm \"{2},{3}\"", size_x, size_y, font, fontsize);
+					break;
+				case Terminal.epscairo:
+					Stream.WriteLine("set term epscairo enhanced \"{0},{1}\" size {2}mm,{3}mm", font, fontsize, size_x, size_y);
+					break;
+				case Terminal.pdfcairo:
+					Stream.WriteLine("set term pdfcairo enhanced color \"{0},{1}\" size {2}mm,{3}mm", font, fontsize, size_x, size_y);
+					break;
+				case Terminal.pngcairo:
+					Stream.WriteLine("set term pngcairo enhanced size {0},{1}", size_x, size_y);
+					break;
+				default:
+					break;
+			}
+
+		//	Stream.WriteLine("set term svg");
 		}
 
 		public void SetOutput(string filename)
 		{
 			ThrowExceptionIfDisposed();
-			Stream.WriteLine("set output \"{0}.eps\"", filename);
+			Stream.WriteLine("set output \"{0}\"", filename);
 		}
 		public void SetOutput()
 		{
