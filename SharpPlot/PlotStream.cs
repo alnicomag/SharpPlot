@@ -164,7 +164,7 @@ namespace SharpPlot
 		public void SetLineStyle(int style_num, LineStyle ls)
 		{
 			ThrowExceptionIfDisposed();
-			Stream.WriteLine("set style line {0} lt {1} lw {2} lc rgbcolor'{3}'", style_num, ls.LineType, ls.Width, "#" + ls.Color.R + ls.Color.G + ls.Color.B);
+			Stream.WriteLine("set style line {0} lt {1} lw {2} lc rgbcolor'{3}' pointtype {4} pointsize {5}", style_num, ls.LineType, ls.Width, "#" + ls.Color.R + ls.Color.G + ls.Color.B, ls.PointType, ls.PointSize);
 		}
 
 		public void SetCircleStyle()
@@ -557,16 +557,16 @@ namespace SharpPlot
 
 		private void SetDefaultLineStyle()
 		{
-			SetLineStyle(1, new LineStyle(1, 2, Color.Red));
-			SetLineStyle(2, new LineStyle(1, 2, Color.Green));
-			SetLineStyle(3, new LineStyle(1, 2, Color.Blue));
-			SetLineStyle(4, new LineStyle(1, 2, Color.Purple));
-			SetLineStyle(5, new LineStyle(1, 2, Color.Cyan));
-			SetLineStyle(6, new LineStyle(1, 2, Color.Orange));
-			SetLineStyle(7, new LineStyle(1, 2, Color.Black));
-			SetLineStyle(8, new LineStyle(2, 2, Color.Red));
-			SetLineStyle(9, new LineStyle(2, 2, Color.Green));
-			SetLineStyle(10, new LineStyle(2, 2, Color.Blue));
+			SetLineStyle(1, new LineStyle(1, 2, Color.Red,7,4));
+			SetLineStyle(2, new LineStyle(1, 2, Color.Green, 7, 4));
+			SetLineStyle(3, new LineStyle(1, 2, Color.Blue, 7, 4));
+			SetLineStyle(4, new LineStyle(1, 2, Color.Purple, 7, 4));
+			SetLineStyle(5, new LineStyle(1, 2, Color.Cyan, 7, 4));
+			SetLineStyle(6, new LineStyle(1, 2, Color.Orange, 7, 4));
+			SetLineStyle(7, new LineStyle(1, 2, Color.Black, 7, 4));
+			SetLineStyle(8, new LineStyle(2, 2, Color.Red, 7, 4));
+			SetLineStyle(9, new LineStyle(2, 2, Color.Green, 7, 4));
+			SetLineStyle(10, new LineStyle(2, 2, Color.Blue, 7, 4));
 		}
 
 		private static readonly string DefaultLabelFont;
