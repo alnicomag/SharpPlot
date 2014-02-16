@@ -387,6 +387,11 @@ namespace SharpPlot
 			ThrowExceptionIfDisposed();
 			Stream.WriteLine("set ytics {0},{1}", start, tic);
 		}
+		public void SetYTics(double start, double tic, double end)
+		{
+			ThrowExceptionIfDisposed();
+			Stream.WriteLine("set ytics {0},{1},{2}", start, tic, end);
+		}
 		public void SetY2Tics()
 		{
 			ThrowExceptionIfDisposed();
